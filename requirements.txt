@@ -3,3 +3,6 @@ langchain
 langchain_community
 langchain_openai
 langchain_google_genai
+streamlit 
+python-dotenv
+pypdf

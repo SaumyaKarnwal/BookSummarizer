@@ -1,32 +1,29 @@
-from pyPDF2 import PdfReader
+from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
-import os
-
-# Retrieve the API key from the environment variable
-google_api_key = os.getenv("GOOGLE_API_KEY")
+from langchain.document_loaders import PyPDFLoader
 
 # this module does the following 
 # --- extract text from pdf
 # --- segment the text
 # --- embed the text and ungest it in vector store
 
-
-# read the PDF content and store it as raw text
 def get_pdf_content(docs):
-    raw_text =""
+    raw_text = ""
     
-    for doc in docs :
-        pdf_reader = PdfReader(doc)
-        for page in pdf_reader.pages:
-            raw_text += page.extract_text()
+    for doc in docs:
+        pdf_loader = PyPDFLoader(doc)
+        pages = pdf_loader.load()  # Load pages using PyPDFLoader's method
+        for page in pages:
+            raw_text += page.page_content  # Access page content directly
     
     return raw_text
 
 # chunking
 def get_chunks(text):
+    
     text_splitter = CharacterTextSplitter(
         separator="\n",
         chunk_size =1000,
@@ -38,13 +35,13 @@ def get_chunks(text):
 
 # creating an embedding and storing it in the vector DB
 def get_embeddings(chunks):
-    embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001", google_api_key=google_api_key)
+    embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
     vector_storage = FAISS.from_texts(texts=chunks, embedding=embeddings)
 
     return vector_storage
 
 # final func
-def preproccess(docs):
+def preprocess(docs):
     
     raw_text = get_pdf_content(docs)
 
