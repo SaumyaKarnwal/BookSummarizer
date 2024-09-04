@@ -3,8 +3,10 @@ from langchain.text_splitter import CharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from constants import GOOGLE_API_KEY
+import os
 
+# Retrieve the API key from the environment variable
+google_api_key = os.getenv("GOOGLE_API_KEY")
 
 # this module does the following 
 # --- extract text from pdf
@@ -36,7 +38,7 @@ def get_chunks(text):
 
 # creating an embedding and storing it in the vector DB
 def get_embeddings(chunks):
-    embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001", google_api_key=GOOGLE_API_KEY)
+    embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001", google_api_key=google_api_key)
     vector_storage = FAISS.from_texts(texts=chunks, embedding=embeddings)
 
     return vector_storage
